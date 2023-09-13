@@ -1,11 +1,11 @@
 client
 
-{% for option, value in (_openvpn_client_default_options | combine(connection.options)).items() %}
+{% for option, value in (_openvpn_client_default_options | combine(openvpn_client_connection_content.options)).items() %}
 {{ option }}{% if value %} {{ value }}{% endif %}
 
 {% endfor %}
 
-{% for section, content in connection.sections.items() %}
+{% for section, content in openvpn_client_connection_content.sections.items() %}
 <{{ section }}>
 {{ content }}
 </{{ section }}>
