@@ -1,0 +1,19 @@
+- set_fact:
+    openvpn_client_connection_name: "{{ openvpn_client_connection.key }}"
+    openvpn_client_connection_content: "{{ openvpn_client_connection.value }}"
+
+- name: Template connection configuration
+  ansible.builtin.template:
+    src: "ovpn.j2"
+    dest: "{{ openvpn_client_path }}/{{ openvpn_client_connection_name }}.ovpn"
+    owner: "{{ openvpn_user }}"
+    group: "{{ openvpn_group }}"
+    mode: '0640'
+
+- name: Write password file
+  ansible.builtin.copy:
+    content: "{{ openvpn_client_connection_content.secret }}"
+    dest: "{{ openvpn_client_path }}/{{ openvpn_client_connection_name }}.secret"
+    owner: "{{ openvpn_user }}"
+    group: "{{ openvpn_group }}"
+    mode: '0640'

@@ -1,0 +1,15 @@
+- name: Configure ExecStart
+  lineinfile:
+    path: "{{ path }}"
+    state: present
+    backrefs: yes
+    regexp: '^(ExecStart=[^\s]+).*$'
+    line: '\1 --daemon ovpn-%i --status {{ _openvpn_paths.run }}/%i.status --config {{ openvpn_client_path }}/%i.ovpn --writepid {{ _openvpn_paths.run }}/%i.pid --askpass {{ openvpn_client_path }}/%i.secret'
+
+- name: Configure PIDFile
+  lineinfile:
+    path: "{{ path }}"
+    state: present
+    backrefs: yes
+    regexp: '^(PIDFile=).*$'
+    line: '\1{{ _openvpn_paths.run }}/%i.pid'

@@ -1,0 +1,11 @@
+openvpn_update_resolvconf_replacement: ~
+
+openvpn_user: root
+openvpn_group: nogroup
+
+openvpn_dns:
+  nsswitch:
+    conf_path: /etc/nsswitch.conf
+    host_precedence: 'files mdns4_minimal resolve dns [!UNAVAIL=return] myhostname'
+
+openvpn_client_connnections: {}

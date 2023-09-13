@@ -1,0 +1,33 @@
+- name: Install pre-requisite packages
+  package:
+    name: "{{ openvpn_client_packages }}"
+    state: present
+
+- name: Locate service definition file(s)
+  ansible.builtin.find:
+    paths: "{{ _openvpn_service_paths }}"
+    patterns: 'openvpn@.service'
+  register: openvpn_service_definitions
+
+- set_fact:
+    openvpn_client_path: '{{ _openvpn_paths.root }}/{{ _openvpn_paths.client }}'
+    openvpn_service_definition_files: "{{ openvpn_service_definitions.files | map(attribute='path') | list }}"
+
+- name: Configure service definition file(s)
+  include_tasks:  systemd_definitions.yaml
+  loop: '{{ openvpn_service_definition_files }}'
+  loop_control:
+    loop_var: "path"
+
+- name: Configure OpenVPN clients
+  include_tasks: openvpn_client.yaml
+  loop: "{{ openvpn_client_connections | dict2items }}"
+  loop_control:
+    loop_var: "openvpn_client_connection"
+
+- name: Reconfigure systemd-resolve[d]
+  include_tasks: fix_systemd_resolve.yaml
+
+- name: "Reload systemd"
+  ansible.builtin.systemd:
+    daemon_reload: "yes"

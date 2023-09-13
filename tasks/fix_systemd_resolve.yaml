@@ -1,0 +1,17 @@
+- name: Replace update-resolv-conf
+  get_url:
+    url: "{{ openvpn_update_resolvconf_replacement }}"
+    dest: "{{ _openvpn_paths.root }}/{{ _openvpn_paths.update_resolvconf }}"
+    owner: "{{ openvpn_user }}"
+    group: "{{ openvpn_group }}"
+    mode: '0755'
+  when: "openvpn_update_resolvconf_replacement is defined and openvpn_update_resolvconf_replacement is not none"
+
+- name: Prevent MDNS4 from taking precedence in nsswitch
+  lineinfile:
+    path: "{{ openvpn_dns.nsswitch.conf_path }}"
+    state: present
+    backrefs: true
+    regex: '^(hosts:\s+).*$'
+    line: '\1{{ openvpn_dns.nsswitch.host_precedence }}'
+  notify: "Reload systemd-resolved"
